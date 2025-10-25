@@ -85,6 +85,16 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     if (_pendingOperation == null || _currentInput.isEmpty) return;
 
     final secondOperand = double.parse(_currentInput);
+    
+    // Обработка деления на ноль перед вычислением
+    if (_pendingOperation == "÷" && secondOperand == 0) {
+      _display = "Ошибка";
+      _currentInput = _display;
+      _pendingOperation = null;
+      _shouldResetInput = true;
+      return;
+    }
+    
     final result = _calculate(_firstOperand!, secondOperand, _pendingOperation!);
     
     _updateDisplay(result);
@@ -140,34 +150,51 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     _display = _currentInput;
   }
 
-  double _calculate(double a, double b, String operation) {
-    switch (operation) {
-      case "+": return a + b;
-      case "-": return a - b;
-      case "×": return a * b;
-      case "÷": 
-        if (b == 0) throw const FormatException("Division by zero");
-        return a / b;
-      case "^": return math.pow(a, b).toDouble();
-      default: return 0;
+  double? _calculate(double a, double b, String operation) {
+    try {
+      switch (operation) {
+        case "+": return a + b;
+        case "-": return a - b;
+        case "×": return a * b;
+        case "÷": 
+          // Проверка деления на ноль
+          if (b == 0) return null;
+          return a / b;
+        case "^": 
+          // Проверка на слишком большие числа
+          final result = math.pow(a, b);
+          if (result.isInfinite) return null;
+          return result.toDouble();
+        default: return 0;
+      }
+    } catch (e) {
+      // Обработка любых других математических ошибок
+      return null;
     }
   }
 
-  void _updateDisplay(double result) {
-    if (result.isInfinite || result.isNaN) {
+  void _updateDisplay(double? result) {
+    // Если результат null (ошибка) или бесконечность/NaN
+    if (result == null || result.isInfinite || result.isNaN) {
       _display = "Ошибка";
       return;
     }
 
     String resultString = result.toString();
     
+    // Убираем .0 для целых чисел
     if (resultString.endsWith('.0')) {
       resultString = resultString.substring(0, resultString.length - 2);
     }
 
+    // Обработка длинных чисел
     if (resultString.length > _maxDisplayLength) {
       if (resultString.contains('.')) {
-        _display = result.toStringAsPrecision(8);
+        try {
+          _display = double.parse(resultString).toStringAsPrecision(8);
+        } catch (e) {
+          _display = "Слишком длинное";
+        }
       } else {
         _display = "Слишком длинное";
       }
