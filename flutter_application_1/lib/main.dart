@@ -1,122 +1,624 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const UnitConverterApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class UnitConverterApp extends StatelessWidget {
+  const UnitConverterApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Конвертер единиц',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        primarySwatch: Colors.blue,
+        useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const HomeScreen(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        title: const Text('Конвертер единиц'),
+        elevation: 2,
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
+      body: _buildCategoryList(),
+    );
+  }
+
+  Widget _buildCategoryList() {
+    const categories = [
+      _CategoryItem('📏', 'Длина', Colors.blue),
+      _CategoryItem('⚖️', 'Вес', Colors.green),
+      _CategoryItem('🌡️', 'Температура', Colors.orange),
+      _CategoryItem('📐', 'Площадь', Colors.purple),
+      _CategoryItem('🧪', 'Объем', Colors.red),
+      _CategoryItem('⏰', 'Время', Colors.teal),
+    ];
+
+    return ListView.separated(
+      padding: const EdgeInsets.all(16),
+      itemCount: categories.length,
+      separatorBuilder: (context, index) => const SizedBox(height: 8),
+      itemBuilder: (context, index) {
+        final category = categories[index];
+        return _CategoryCard(
+          icon: category.icon,
+          title: category.title,
+          color: category.color,
+          onTap: () => _navigateToConverter(context, category.title),
+        );
+      },
+    );
+  }
+
+  void _navigateToConverter(BuildContext context, String category) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ConverterScreen(category: category),
+      ),
+    );
+  }
+}
+
+class _CategoryItem {
+  final String icon;
+  final String title;
+  final Color color;
+
+  const _CategoryItem(this.icon, this.title, this.color);
+}
+
+class _CategoryCard extends StatelessWidget {
+  final String icon;
+  final String title;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _CategoryCard({
+    required this.icon,
+    required this.title,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 1,
+      child: ListTile(
+        leading: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Text(icon, style: const TextStyle(fontSize: 20)),
+        ),
+        title: Text(
+          title,
+          style: const TextStyle(fontWeight: FontWeight.w500),
+        ),
+        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+        onTap: onTap,
+      ),
+    );
+  }
+}
+
+class ConverterScreen extends StatefulWidget {
+  final String category;
+
+  const ConverterScreen({super.key, required this.category});
+
+  @override
+  State<ConverterScreen> createState() => _ConverterScreenState();
+}
+
+class _ConverterScreenState extends State<ConverterScreen> {
+  static const _maxInputLength = 12;
+  String _input = '';
+  String _result = '0';
+  String _fromUnit = '';
+  String _toUnit = '';
+
+  late final ConversionManager _conversionManager;
+
+  @override
+  void initState() {
+    super.initState();
+    _conversionManager = ConversionManager();
+    final units = _conversionManager.getAvailableUnits(widget.category);
+    _fromUnit = units.first;
+    _toUnit = units.length > 1 ? units[1] : units.first;
+    _calculateResult();
+  }
+
+  void _onDigitPressed(String digit) {
+    if (_input.length >= _maxInputLength) return;
+    
+    setState(() {
+      _input += digit;
+      _calculateResult();
+    });
+  }
+
+  void _onDecimalPressed() {
+    if (_input.length >= _maxInputLength || _input.contains('.')) return;
+    
+    setState(() {
+      _input += _input.isEmpty ? '0.' : '.';
+      _calculateResult();
+    });
+  }
+
+  void _calculateResult() {
+    if (_input.isEmpty) {
+      setState(() => _result = '0');
+      return;
+    }
+
+    try {
+      final value = double.parse(_input);
+      final converted = _conversionManager.convert(
+        value: value,
+        category: widget.category,
+        fromUnit: _fromUnit,
+        toUnit: _toUnit,
+      );
+      setState(() => _result = _formatNumber(converted));
+    } catch (e) {
+      setState(() => _result = 'Ошибка');
+    }
+  }
+
+  String _formatNumber(double number) {
+    if (number == 0) return '0';
+    
+    final absValue = number.abs();
+    if (absValue > 1e6 || absValue < 1e-6) {
+      return number.toStringAsExponential(4);
+    } else if (absValue < 1) {
+      return number.toStringAsPrecision(6);
+    } else {
+      return number.toStringAsFixed(4).replaceAll(RegExp(r'\.?0+$'), '');
+    }
+  }
+
+  void _swapUnits() {
+    setState(() {
+      final temp = _fromUnit;
+      _fromUnit = _toUnit;
+      _toUnit = temp;
+      _calculateResult();
+    });
+  }
+
+  void _clearInput() {
+    setState(() {
+      _input = '';
+      _result = '0';
+    });
+  }
+
+  void _backspace() {
+    if (_input.isNotEmpty) {
+      setState(() {
+        _input = _input.substring(0, _input.length - 1);
+        _calculateResult();
+      });
+    }
+  }
+
+  bool get _isInputLimitReached => _input.length >= _maxInputLength;
+
+  @override
+  Widget build(BuildContext context) {
+    final availableUnits = _conversionManager.getAvailableUnits(widget.category);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.category),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
         child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+          children: [
+            // Ввод
+            _ConversionCard(
+              title: 'Из',
+              value: _input.isEmpty ? '0' : _input,
+              selectedUnit: _fromUnit,
+              availableUnits: availableUnits,
+              isInput: true,
+              characterCount: '${_input.length}/$_maxInputLength',
+              showWarning: _isInputLimitReached,
+              onUnitChanged: (unit) {
+                setState(() {
+                  _fromUnit = unit!;
+                  _calculateResult();
+                });
+              },
+            ),
+
+            const SizedBox(height: 16),
+
+            // Кнопка обмена
+            IconButton(
+              onPressed: _swapUnits,
+              icon: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(Icons.swap_vert, size: 24),
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // Результат
+            _ConversionCard(
+              title: 'В',
+              value: _result,
+              selectedUnit: _toUnit,
+              availableUnits: availableUnits,
+              isResult: true,
+              onUnitChanged: (unit) {
+                setState(() {
+                  _toUnit = unit!;
+                  _calculateResult();
+                });
+              },
+            ),
+
+            const Spacer(),
+
+            // Цифровая клавиатура
+            _NumberPad(
+              onDigitPressed: _onDigitPressed,
+              onDecimalPressed: _onDecimalPressed,
+              onBackspace: _backspace,
+              onClear: _clearInput,
+              isInputLimitReached: _isInputLimitReached,
             ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
+  }
+}
+
+class _ConversionCard extends StatelessWidget {
+  final String title;
+  final String value;
+  final String selectedUnit;
+  final List<String> availableUnits;
+  final bool isInput;
+  final bool isResult;
+  final String? characterCount;
+  final bool? showWarning;
+  final ValueChanged<String?> onUnitChanged;
+
+  const _ConversionCard({
+    required this.title,
+    required this.value,
+    required this.selectedUnit,
+    required this.availableUnits,
+    required this.onUnitChanged,
+    this.isInput = false,
+    this.isResult = false,
+    this.characterCount,
+    this.showWarning,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final textColor = isResult ? Theme.of(context).primaryColor : Colors.black;
+    final warningColor = Colors.red;
+
+    return Card(
+      elevation: 2,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    color: isResult ? Theme.of(context).primaryColor : Colors.grey[600],
+                    fontSize: 14,
+                  ),
+                ),
+                if (characterCount != null)
+                  Text(
+                    characterCount!,
+                    style: TextStyle(
+                      color: (showWarning ?? false) ? warningColor : Colors.grey,
+                      fontSize: 12,
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    value,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      color: textColor,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                DropdownButton<String>(
+                  value: selectedUnit,
+                  onChanged: onUnitChanged,
+                  items: availableUnits.map((unit) {
+                    return DropdownMenuItem<String>(
+                      value: unit,
+                      child: Text(unit),
+                    );
+                  }).toList(),
+                ),
+              ],
+            ),
+            if (showWarning ?? false) ...[
+              const SizedBox(height: 8),
+              Text(
+                'Достигнут лимит ввода',
+                style: TextStyle(
+                  color: warningColor,
+                  fontSize: 12,
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _NumberPad extends StatelessWidget {
+  final Function(String) onDigitPressed;
+  final VoidCallback onDecimalPressed;
+  final VoidCallback onBackspace;
+  final VoidCallback onClear;
+  final bool isInputLimitReached;
+
+  const _NumberPad({
+    required this.onDigitPressed,
+    required this.onDecimalPressed,
+    required this.onBackspace,
+    required this.onClear,
+    required this.isInputLimitReached,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 3,
+            crossAxisSpacing: 8,
+            mainAxisSpacing: 8,
+            childAspectRatio: 1.5,
+          ),
+          itemCount: 12,
+          itemBuilder: (context, index) {
+            if (index < 9) {
+              // Цифры 1-9
+              return _NumberButton(
+                label: (index + 1).toString(),
+                onPressed: () => onDigitPressed((index + 1).toString()),
+                isDisabled: isInputLimitReached,
+              );
+            } else if (index == 9) {
+              // Точка
+              return _NumberButton(
+                label: '.',
+                onPressed: isInputLimitReached ? null : onDecimalPressed,
+                isDisabled: isInputLimitReached,
+              );
+            } else if (index == 10) {
+              // Ноль
+              return _NumberButton(
+                label: '0',
+                onPressed: () => onDigitPressed('0'),
+                isDisabled: isInputLimitReached,
+              );
+            } else {
+              // Backspace
+              return _NumberButton(
+                label: '⌫',
+                onPressed: onBackspace,
+                backgroundColor: Colors.orange[100],
+                textColor: Colors.orange[800],
+              );
+            }
+          },
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          height: 48,
+          child: ElevatedButton(
+            onPressed: onClear,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: const Text('Очистить'),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _NumberButton extends StatelessWidget {
+  final String label;
+  final VoidCallback? onPressed;
+  final Color? backgroundColor;
+  final Color? textColor;
+  final bool isDisabled;
+
+  const _NumberButton({
+    required this.label,
+    this.onPressed,
+    this.backgroundColor,
+    this.textColor,
+    this.isDisabled = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: isDisabled ? null : onPressed,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: backgroundColor ?? Theme.of(context).primaryColor,
+        foregroundColor: textColor ?? Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        elevation: 1,
+      ),
+      child: Text(
+        label,
+        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+      ),
+    );
+  }
+}
+
+class ConversionManager {
+  final Map<String, Map<String, double>> _conversionFactors = {
+    'Длина': {
+      'Миллиметры': 0.001,
+      'Сантиметры': 0.01,
+      'Метры': 1.0,
+      'Километры': 1000.0,
+      'Дюймы': 0.0254,
+      'Футы': 0.3048,
+      'Ярды': 0.9144,
+      'Мили': 1609.344,
+    },
+    'Вес': {
+      'Миллиграммы': 0.000001,
+      'Граммы': 0.001,
+      'Килограммы': 1.0,
+      'Тонны': 1000.0,
+      'Фунты': 0.453592,
+      'Унции': 0.0283495,
+    },
+    'Температура': {
+      'Цельсий': 1.0,
+      'Фаренгейт': 1.0,
+      'Кельвин': 1.0,
+    },
+    'Площадь': {
+      'Кв. миллиметры': 0.000001,
+      'Кв. сантиметры': 0.0001,
+      'Кв. метры': 1.0,
+      'Гектары': 10000.0,
+      'Кв. километры': 1000000.0,
+      'Акры': 4046.86,
+      'Кв. мили': 2589988.11,
+    },
+    'Объем': {
+      'Миллилитры': 0.001,
+      'Литры': 1.0,
+      'Кубические метры': 1000.0,
+      'Галлоны (US)': 3.78541,
+      'Пинты (US)': 0.473176,
+    },
+    'Время': {
+      'Миллисекунды': 0.001,
+      'Секунды': 1.0,
+      'Минуты': 60.0,
+      'Часы': 3600.0,
+      'Дни': 86400.0,
+      'Недели': 604800.0,
+    },
+  };
+
+  List<String> getAvailableUnits(String category) {
+    return _conversionFactors[category]?.keys.toList() ?? [];
+  }
+
+  double convert({
+    required double value,
+    required String category,
+    required String fromUnit,
+    required String toUnit,
+  }) {
+    if (fromUnit == toUnit) return value;
+
+    if (category == 'Температура') {
+      return _convertTemperature(value, fromUnit, toUnit);
+    }
+
+    final factors = _conversionFactors[category];
+    if (factors == null) throw Exception('Категория не найдена');
+
+    final fromFactor = factors[fromUnit];
+    final toFactor = factors[toUnit];
+    
+    if (fromFactor == null || toFactor == null) {
+      throw Exception('Единица измерения не найдена');
+    }
+
+    return value * fromFactor / toFactor;
+  }
+
+  double _convertTemperature(double value, String from, String to) {
+    if (from == to) return value;
+
+    double celsius;
+    switch (from) {
+      case 'Фаренгейт':
+        celsius = (value - 32) * 5 / 9;
+        break;
+      case 'Кельвин':
+        celsius = value - 273.15;
+        break;
+      default:
+        celsius = value;
+    }
+
+    switch (to) {
+      case 'Фаренгейт':
+        return (celsius * 9 / 5) + 32;
+      case 'Кельвин':
+        return celsius + 273.15;
+      default:
+        return celsius;
+    }
   }
 }
