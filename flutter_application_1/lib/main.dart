@@ -50,6 +50,7 @@ class _CalendarState extends State<Calendar> {
     return date.year == now.year && date.month == now.month && date.day == now.day;
   }
 
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -71,29 +72,44 @@ class _CalendarState extends State<Calendar> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.max,
                 children: [
                   IconButton(
-                    padding: EdgeInsets.symmetric(vertical: 10),
+                    padding: EdgeInsets.symmetric(vertical: 4),
+                    onPressed: () {
+                      _goToPrevYear();
+                    },
+                    icon: Icon(Icons.keyboard_double_arrow_left_rounded),
+                  ),
+                  IconButton(
+                    padding: EdgeInsets.symmetric(vertical: 3),
                     onPressed: () {
                       _goToPreviousMonth();
                     },
                     icon: Icon(Icons.arrow_back_ios),
                   ),
                   Padding(
-                    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 30),
+                    padding: EdgeInsets.symmetric(vertical: 12),
                     child:
                       Text(
                         _displayedMonth, 
                         textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 20),
+                        style: TextStyle(fontSize: 15),
                         ),
                     ),
                   IconButton(
-                    padding: EdgeInsets.symmetric(vertical: 10),
+                    padding: EdgeInsets.symmetric(vertical: 5),
                     onPressed: () {
                       _goToNextMonth();
                     },
                     icon: Icon(Icons.arrow_forward_ios),
+                  ),
+                  IconButton(
+                    padding: EdgeInsets.symmetric(vertical: 3),
+                    onPressed: () {
+                      _goToNextYear();
+                    },
+                    icon: Icon(Icons.keyboard_double_arrow_right_rounded),
                   ),
                 ],
               ),
@@ -205,6 +221,18 @@ class _CalendarState extends State<Calendar> {
   void _goToCurrentMonth() {
     setState(() {
       _currentDate = DateTime(_today.year, _today.month);
+    });
+  }
+
+  void _goToNextYear() {
+    setState(() {
+      _currentDate = DateTime(_currentDate.year + 1, _currentDate.month);
+    });
+  }
+
+    void _goToPrevYear() {
+    setState(() {
+      _currentDate = DateTime(_currentDate.year - 1, _currentDate.month);
     });
   }
 }
