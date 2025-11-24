@@ -62,7 +62,7 @@ class _CalendarState extends State<Calendar> {
         body: Container(
           color: const Color.fromARGB(255, 175, 230, 255),
           margin: EdgeInsets.only(top: 20, bottom: 300, right: 20, left: 20),
-          padding: EdgeInsetsGeometry.only(top:30, left: 30, right: 30, bottom: 30),
+          padding: EdgeInsets.only(top:30, left: 30, right: 30, bottom: 30),
           child:
             Column(
               mainAxisSize: MainAxisSize.min,
@@ -80,7 +80,7 @@ class _CalendarState extends State<Calendar> {
                     icon: Icon(Icons.arrow_back_ios),
                   ),
                   Padding(
-                    padding: EdgeInsetsGeometry.symmetric(vertical: 12, horizontal: 30),
+                    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 30),
                     child:
                       Text(
                         _displayedMonth, 
@@ -102,37 +102,37 @@ class _CalendarState extends State<Calendar> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                    padding: EdgeInsetsGeometry.symmetric(horizontal: 12, vertical: 10),
+                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                     child:
                     Text('Пн', style: TextStyle(fontWeight: FontWeight.w300)),
                   ),
                   Padding(
-                    padding: EdgeInsetsGeometry.symmetric(horizontal: 12, vertical: 10),
+                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                     child:
                     Text('Вт', style: TextStyle(fontWeight: FontWeight.w300)),
                   ),
                   Padding(
-                    padding: EdgeInsetsGeometry.symmetric(horizontal: 12, vertical: 10),
+                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                     child:
                     Text('Ср', style: TextStyle(fontWeight: FontWeight.w300)),
                   ),
                   Padding(
-                    padding: EdgeInsetsGeometry.symmetric(horizontal: 12, vertical: 10),
+                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                     child:
                     Text('Чт', style: TextStyle(fontWeight: FontWeight.w300)),
                   ),
                   Padding(
-                    padding: EdgeInsetsGeometry.symmetric(horizontal: 12, vertical: 10),
+                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                     child:
                     Text('Пт', style: TextStyle(fontWeight: FontWeight.w300)),
                   ),
                   Padding(
-                    padding: EdgeInsetsGeometry.symmetric(horizontal: 12, vertical: 10),
+                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                     child:
                     Text('Сб', style: TextStyle(fontWeight: FontWeight.w300)),
                   ),
                   Padding(
-                    padding: EdgeInsetsGeometry.symmetric(horizontal: 12, vertical: 10),
+                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                     child:
                     Text('Вс', style: TextStyle(fontWeight: FontWeight.w300)),
                   ),
