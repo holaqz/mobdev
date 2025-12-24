@@ -1,0 +1,9 @@
+{
+  "@@locale": "en",
+  "appTitle": "Food Reference",
+  "searchHint": "Search product...",
+  "addButton": "Add",
+  "editButton": "Edit",
+  "deleteButton": "Delete",
+  "emptyList": "No items yet"
+}

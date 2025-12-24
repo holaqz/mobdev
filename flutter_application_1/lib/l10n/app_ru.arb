@@ -1,0 +1,9 @@
+{
+  "@@locale": "ru",
+  "appTitle": "Справочник продуктов",
+  "searchHint": "Поиск продукта...",
+  "addButton": "Добавить",
+  "editButton": "Редактировать",
+  "deleteButton": "Удалить",
+  "emptyList": "Пока нет записей"
+}
