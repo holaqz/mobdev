@@ -5,5 +5,15 @@
   "addButton": "Добавить",
   "editButton": "Редактировать",
   "deleteButton": "Удалить",
-  "emptyList": "Пока нет записей"
+  "emptyList": "Пока нет записей",
+  "categoryAll": "Все",
+  "categoryCereals": "Гарнир",
+  "categorySeafood": "Морепродукты",
+  "categoryMeat": "Мясо",
+  "categoryBakery": "Выпечка",
+  "categoryVegetables": "Овощи",
+  "categoryFruits": "Фрукты",
+  "categoryDairy": "Молочка",
+  "categorySnacks": "Закуски",
+  "categoryDrinks": "Напитки"
 }

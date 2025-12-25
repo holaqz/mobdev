@@ -25,4 +25,34 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get emptyList => 'No items yet';
+
+  @override
+  String get categoryAll => 'All';
+
+  @override
+  String get categoryCereals => 'Cereals';
+
+  @override
+  String get categorySeafood => 'Seafood';
+
+  @override
+  String get categoryMeat => 'Meat';
+
+  @override
+  String get categoryBakery => 'Bakery';
+
+  @override
+  String get categoryVegetables => 'Vegetables';
+
+  @override
+  String get categoryFruits => 'Fruits';
+
+  @override
+  String get categoryDairy => 'Dairy';
+
+  @override
+  String get categorySnacks => 'Snacks';
+
+  @override
+  String get categoryDrinks => 'Drinks';
 }

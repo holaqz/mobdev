@@ -5,5 +5,15 @@
   "addButton": "Add",
   "editButton": "Edit",
   "deleteButton": "Delete",
-  "emptyList": "No items yet"
+  "emptyList": "No items yet",
+  "categoryAll": "All",
+  "categoryCereals": "Cereals",
+  "categorySeafood": "Seafood",
+  "categoryMeat": "Meat",
+  "categoryBakery": "Bakery",
+  "categoryVegetables": "Vegetables",
+  "categoryFruits": "Fruits",
+  "categoryDairy": "Dairy",
+  "categorySnacks": "Snacks",
+  "categoryDrinks": "Drinks"
 }

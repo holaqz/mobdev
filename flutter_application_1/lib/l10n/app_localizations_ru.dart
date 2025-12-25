@@ -25,4 +25,34 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get emptyList => 'Пока нет записей';
+
+  @override
+  String get categoryAll => 'Все';
+
+  @override
+  String get categoryCereals => 'Гарнир';
+
+  @override
+  String get categorySeafood => 'Морепродукты';
+
+  @override
+  String get categoryMeat => 'Мясо';
+
+  @override
+  String get categoryBakery => 'Выпечка';
+
+  @override
+  String get categoryVegetables => 'Овощи';
+
+  @override
+  String get categoryFruits => 'Фрукты';
+
+  @override
+  String get categoryDairy => 'Молочка';
+
+  @override
+  String get categorySnacks => 'Закуски';
+
+  @override
+  String get categoryDrinks => 'Напитки';
 }
